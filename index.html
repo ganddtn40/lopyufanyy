@@ -13,6 +13,52 @@
     box-sizing: border-box;
 }
 
+/* OPENING PAGE */
+.opening {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #ffdee9, #fff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    transition: opacity 1s ease, visibility 1s ease;
+}
+
+.opening.hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.opening-box {
+    text-align: center;
+    animation: fadeIn 1.5s ease forwards;
+}
+
+.opening-box h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: #df1641;
+    margin-bottom: 20px;
+}
+
+.opening-box button {
+    padding: 12px 30px;
+    border-radius: 30px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    background: #df1641;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* MAIN PAGE */
 body {
     min-height: 100vh;
     background: linear-gradient(135deg, #fce4ec, #ffffff, #ffebee);
@@ -89,12 +135,12 @@ body {
     100% { transform: scale(1); opacity: 1; }
 }
 
-/* CSS HEART (ANTI BUG EMOJI) */
+/* CSS HEART */
 .heart-shape {
     position: relative;
     width: 16px;
     height: 16px;
-    background:lch(47.35% 73.17 9.33);
+    background: lch(47.35% 73.17 9.33);
     transform: rotate(-45deg);
 }
 
@@ -126,32 +172,34 @@ body {
     color: #df1641;
     opacity: 0;
     transform: translateY(20px);
-    text-shadow:
-        0 3px 6px rgba(0,0,0,0.35),
-        0 0 12px rgba(255,105,180,0.6),
-        0 0 25px rgba(255,105,180,0.4);
 }
 
 @keyframes fadeInLoveText {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* MOBILE FIX */
+/* MOBILE */
 @media (max-width: 480px) {
-    .container { padding: 25px; }
-    .heart-cell { width: 18px; height: 18px; margin: 0.5px; }
-    .heart-shape { width: 14px; height: 14px; }
-    .heart-shape::before,
-    .heart-shape::after { width: 14px; height: 14px; }
     .love-text { font-size: 36px; }
     .character-img { width: 120px; }
-    .hearts-container.move-up { transform: translateY(-20px); }
 }
 </style>
 </head>
 
 <body>
+
+<!-- OPENING -->
+<div class="opening" id="opening">
+    <div class="opening-box">
+        <h1>Untuk Kamu ❤️</h1>
+        <button onclick="startLove()">Buka</button>
+    </div>
+</div>
+
+<!-- MUSIC -->
 <audio id="bgMusic" src="lagu.mp3" preload="auto"></audio>
+
+<!-- MAIN -->
 <div class="container">
 
     <div class="character-section">
@@ -181,7 +229,6 @@ const heartPattern = [
 function createHearts() {
     const container = document.getElementById('heartsContainer');
     const text = document.getElementById('loveText');
-    container.innerHTML = '';
     let totalDelay = 0;
 
     heartPattern.forEach((row, r) => {
@@ -198,7 +245,6 @@ function createHearts() {
                 totalDelay = delay;
                 setTimeout(() => cellDiv.classList.add('active'), delay);
             }
-
             rowDiv.appendChild(cellDiv);
         });
 
@@ -207,13 +253,16 @@ function createHearts() {
 
     setTimeout(() => {
         container.classList.add('move-up');
-        setTimeout(() => {
-            text.style.animation = 'fadeInLoveText 1.5s ease forwards';
-        }, 600);
+        text.style.animation = 'fadeInLoveText 1.5s ease forwards';
     }, totalDelay + 300);
 }
 
-window.onload = () => setTimeout(createHearts, 400);
+function startLove() {
+    document.getElementById('opening').classList.add('hide');
+    const music = document.getElementById('bgMusic');
+    music.play();
+    setTimeout(createHearts, 500);
+}
 </script>
 
 </body>
