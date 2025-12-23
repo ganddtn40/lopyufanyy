@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>I Love You ❤️</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fce4ec, #ffffff, #ffebee);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    position: relative;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    padding: 40px;
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+}
+
+/* CHARACTER */
+.character-section {
+    position: absolute;
+    bottom: 25px;
+    left: 30px;
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: characterIn 1.5s ease forwards;
+    animation-delay: 2.5s;
+}
+
+@keyframes characterIn {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.character-img {
+    width: 160px;
+}
+
+/* HEARTS */
+.hearts-container {
+    margin-top: 70px;
+    margin-bottom: 25px;
+    transition: transform 1.2s ease;
+}
+
+.hearts-container.move-up {
+    transform: translateY(-35px);
+}
+
+.heart-row {
+    display: flex;
+    justify-content: center;
+}
+
+.heart-cell {
+    width: 22px;
+    height: 22px;
+    margin: 1px;
+    transform: scale(0);
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.heart-cell.active {
+    animation: popHeart 0.6s ease forwards;
+}
+
+@keyframes popHeart {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* CSS HEART (ANTI BUG EMOJI) */
+.heart-shape {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    background:lch(47.35% 73.17 9.33);
+    transform: rotate(-45deg);
+}
+
+.heart-shape::before,
+.heart-shape::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: lch(47.35% 73.17 9.33);
+    border-radius: 50%;
+}
+
+.heart-shape::before {
+    top: -8px;
+    left: 0;
+}
+
+.heart-shape::after {
+    left: 8px;
+    top: 0;
+}
+
+/* TEXT */
+.love-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 600;
+    color: #df1641;
+    opacity: 0;
+    transform: translateY(20px);
+    text-shadow:
+        0 3px 6px rgba(0,0,0,0.35),
+        0 0 12px rgba(255,105,180,0.6),
+        0 0 25px rgba(255,105,180,0.4);
+}
+
+@keyframes fadeInLoveText {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* MOBILE FIX */
+@media (max-width: 480px) {
+    .container { padding: 25px; }
+    .heart-cell { width: 18px; height: 18px; margin: 0.5px; }
+    .heart-shape { width: 14px; height: 14px; }
+    .heart-shape::before,
+    .heart-shape::after { width: 14px; height: 14px; }
+    .love-text { font-size: 36px; }
+    .character-img { width: 120px; }
+    .hearts-container.move-up { transform: translateY(-20px); }
+}
+</style>
+</head>
+
+<body>
+<audio id="bgMusic" src="lagu.mp3" preload="auto"></audio>
+<div class="container">
+
+    <div class="character-section">
+        <img src="fanyy.png" class="character-img" alt="Fanyy">
+    </div>
+
+    <div class="hearts-container" id="heartsContainer"></div>
+    <h1 class="love-text" id="loveText">I Love You</h1>
+
+</div>
+
+<script>
+const heartPattern = [
+[0,0,0,1,1,1,0,0,0,1,1,1,0,0,0],
+[0,0,1,1,1,1,1,0,1,1,1,1,1,0,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+[0,0,1,1,1,1,1,1,1,1,1,1,1,0,0],
+[0,0,0,1,1,1,1,1,1,1,1,1,0,0,0],
+[0,0,0,0,1,1,1,1,1,1,1,0,0,0,0],
+[0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
+[0,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+];
+
+function createHearts() {
+    const container = document.getElementById('heartsContainer');
+    const text = document.getElementById('loveText');
+    container.innerHTML = '';
+    let totalDelay = 0;
+
+    heartPattern.forEach((row, r) => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'heart-row';
+
+        row.forEach((cell, c) => {
+            const cellDiv = document.createElement('div');
+            cellDiv.className = 'heart-cell';
+
+            if (cell === 1) {
+                cellDiv.innerHTML = '<div class="heart-shape"></div>';
+                const delay = (r * 15 + c) * 70;
+                totalDelay = delay;
+                setTimeout(() => cellDiv.classList.add('active'), delay);
+            }
+
+            rowDiv.appendChild(cellDiv);
+        });
+
+        container.appendChild(rowDiv);
+    });
+
+    setTimeout(() => {
+        container.classList.add('move-up');
+        setTimeout(() => {
+            text.style.animation = 'fadeInLoveText 1.5s ease forwards';
+        }, 600);
+    }, totalDelay + 300);
+}
+
+window.onload = () => setTimeout(createHearts, 400);
+</script>
+
+</body>
+</html>
